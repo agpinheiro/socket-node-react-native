@@ -1,2 +1,2 @@
 import io from 'socket.io-client';
-export const socket = io('http://192.168.0.115:80');
+export const socket = io('http://143.110.232.194/');
