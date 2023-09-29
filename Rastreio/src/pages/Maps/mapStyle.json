@@ -1,0 +1,45 @@
+[
+  {
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "stylers": [
+      {
+        "saturation": -35
+      },
+      {
+        "lightness": -5
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "stylers": [
+      {
+        "saturation": -30
+      }
+    ]
+  }
+]
