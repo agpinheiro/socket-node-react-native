@@ -23,18 +23,24 @@ const Maps: React.FC<Props> = ({setReturn}) => {
   const mapRef = useRef(null);
 
   useEffect(() => {
+    getLocation();
     const interval = setInterval(() => {
-      Geolocation.getCurrentPosition(position => {
-        if (position) {
-          setUserLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        }
-      });
+      getLocation();
     }, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  const getLocation = () => {
+    Geolocation.getCurrentPosition(position => {
+      if (position) {
+        console.log(position)
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      }
+    });
+  };
 
   useEffect(() => {
     socket.on('driverLocation', data => {
@@ -65,7 +71,7 @@ const Maps: React.FC<Props> = ({setReturn}) => {
               longitude: busLocation.longitude,
             }}
             style={styles.marker}>
-            <IconMap image="https://i0.wp.com/diariodotransporte.com.br/wp-content/uploads/2022/02/Chede-Baruch-Nascimento-Onibus-Brasil.jpg?fit=796%2C554&ssl=1" />
+            <IconMap image="https://2019.onibus.org/3/30/p/17e90fe3e1011016ce06bd45a193643c.jpg" />
           </Marker>
         )}
 
