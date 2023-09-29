@@ -19,6 +19,7 @@ const Welcome: React.FC<Props> = ({onPress}) => {
   const sendDriverLocation = () => {
     Geolocation.getCurrentPosition(position => {
       if (position) {
+        // console.log(position)
         const userLocation = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -37,7 +38,7 @@ const Welcome: React.FC<Props> = ({onPress}) => {
 
   const stopSendLocation = () => {
     if (existsInterval !== null) {
-      BackgroundTimer.stopBackgroundTimer(existsInterval);
+      BackgroundTimer.stopBackgroundTimer();
       setExistsInterval(null);
     }
   };

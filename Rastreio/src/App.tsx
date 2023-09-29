@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 import Welcome from './pages/Welcome/Welcome';
 import Maps from './pages/Maps/Maps';
 import {socket} from './services/socket';

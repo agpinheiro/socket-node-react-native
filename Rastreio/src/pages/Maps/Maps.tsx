@@ -43,6 +43,7 @@ const Maps: React.FC<Props> = ({setReturn}) => {
 
   useEffect(() => {
     socket.on('driverLocation', data => {
+      // console.log(data);
       setBusLocation(data);
     });
   }, []);
