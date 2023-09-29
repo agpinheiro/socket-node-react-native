@@ -33,7 +33,6 @@ const Maps: React.FC<Props> = ({setReturn}) => {
   const getLocation = () => {
     Geolocation.getCurrentPosition(position => {
       if (position) {
-        console.log(position)
         setUserLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
