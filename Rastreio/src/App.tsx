@@ -1,13 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
-import Welcome from './pages/Welcome/Welcome';
-import Maps from './pages/Maps/Maps';
 import {socket} from './services/socket';
 import {handleStatusPermissions} from './utils/permissions';
+import Routes from './routes/routes';
+import { theme } from './theme/theme';
 
 const App = (): JSX.Element => {
-  const [activeMap, setActiveMap] = useState(false);
-
   useEffect(() => {
     handleStatusPermissions();
     socket.on('connect', () => {
@@ -21,12 +19,7 @@ const App = (): JSX.Element => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="default" backgroundColor="#000" />
-
-      {!activeMap ? (
-        <Welcome onPress={() => setActiveMap(!activeMap)} />
-      ) : (
-        <Maps setReturn={() => setActiveMap(!activeMap)} />
-      )}
+      <Routes />
     </SafeAreaView>
   );
 };
@@ -34,8 +27,6 @@ const App = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   text: {
     color: '#000',

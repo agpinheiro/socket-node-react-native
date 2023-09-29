@@ -5,11 +5,10 @@ import {socket} from '../../services/socket';
 import {handleStatusPermissions} from '../../utils/permissions';
 import BackgroundTimer from 'react-native-background-timer';
 import Geolocation from '@react-native-community/geolocation';
+import {useNavigation} from '@react-navigation/native';
 
-interface Props {
-  onPress: () => void;
-}
-const Welcome: React.FC<Props> = ({onPress}) => {
+const Welcome: React.FC = () => {
+  const navigate = useNavigation();
   const [existsInterval, setExistsInterval] = useState<any>(null);
 
   useEffect(() => {
@@ -48,7 +47,7 @@ const Welcome: React.FC<Props> = ({onPress}) => {
       <TouchableOpacity
         onPress={() => {
           handleStatusPermissions();
-          onPress();
+          navigate.navigate('Maps');
         }}
         style={styles.button}>
         <Text style={stylesText.textWhite}>Ir Para o Mapa</Text>
@@ -79,6 +78,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    paddingHorizontal: 10,
   },
   button: {
     backgroundColor: theme.colors.black,
@@ -87,5 +87,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     alignItems: 'center',
+    marginHorizontal: 10,
   },
 });

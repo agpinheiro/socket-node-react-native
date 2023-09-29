@@ -1,10 +1,4 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import MapView, {LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import {stylesText, theme} from '../../theme/theme';
@@ -12,12 +6,10 @@ import mapStyle from './mapStyle.json';
 import Geolocation from '@react-native-community/geolocation';
 import IconMap from './components/IconMap';
 import {socket} from '../../services/socket';
+import {useNavigation} from '@react-navigation/native';
 
-interface Props {
-  setReturn: () => void | Dispatch<SetStateAction<boolean>>;
-}
-
-const Maps: React.FC<Props> = ({setReturn}) => {
+const Maps: React.FC = () => {
+  const navigate = useNavigation();
   const [userLocation, setUserLocation] = useState<LatLng>();
   const [busLocation, setBusLocation] = useState<LatLng>();
   const mapRef = useRef(null);
@@ -86,7 +78,9 @@ const Maps: React.FC<Props> = ({setReturn}) => {
           </Marker>
         )}
       </MapView>
-      <TouchableOpacity onPress={setReturn} style={styles.button}>
+      <TouchableOpacity
+        onPress={() => navigate.navigate('Welcome')}
+        style={styles.button}>
         <Text style={stylesText.textWhite}>Voltar</Text>
       </TouchableOpacity>
     </View>
@@ -97,8 +91,7 @@ export default Maps;
 
 const styles = StyleSheet.create({
   container: {
-    height: theme.screen.height,
-    width: theme.screen.width,
+    flex: 1,
   },
   maps: {
     flex: 1,
