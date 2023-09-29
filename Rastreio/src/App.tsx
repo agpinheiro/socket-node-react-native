@@ -2,12 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
 import Welcome from './pages/Welcome/Welcome';
 import Maps from './pages/Maps/Maps';
-import { socket } from './services/socket';
+import {socket} from './services/socket';
+import {handleStatusPermissions} from './utils/permissions';
 
 const App = (): JSX.Element => {
   const [activeMap, setActiveMap] = useState(false);
 
   useEffect(() => {
+    handleStatusPermissions();
     socket.on('connect', () => {
       console.log('Conectado ao servidor WebSocket');
     });
@@ -23,7 +25,7 @@ const App = (): JSX.Element => {
       {!activeMap ? (
         <Welcome onPress={() => setActiveMap(!activeMap)} />
       ) : (
-        <Maps />
+        <Maps setReturn={() => setActiveMap(!activeMap)} />
       )}
     </SafeAreaView>
   );

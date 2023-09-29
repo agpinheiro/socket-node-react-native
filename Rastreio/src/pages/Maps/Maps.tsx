@@ -1,13 +1,23 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import MapView, {LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
-import {theme} from '../../theme/theme';
+import {stylesText, theme} from '../../theme/theme';
 import mapStyle from './mapStyle.json';
 import Geolocation from '@react-native-community/geolocation';
 import IconMap from './components/IconMap';
 import {socket} from '../../services/socket';
 
-const Maps: React.FC = () => {
+interface Props {
+  setReturn: () => void | Dispatch<SetStateAction<boolean>>;
+}
+
+const Maps: React.FC<Props> = ({setReturn}) => {
   const [userLocation, setUserLocation] = useState<LatLng>();
   const [busLocation, setBusLocation] = useState<LatLng>();
   const mapRef = useRef(null);
@@ -23,23 +33,12 @@ const Maps: React.FC = () => {
         }
       });
     }, 60000);
-    return () => clearInterval(interval)
+    return () => clearInterval(interval);
   }, []);
-  /*   useEffect(() => {
-    const handleLocation = setInterval(() => {
-      setLocation(prev => {
-        return {
-          latitude: prev.latitude + numero(),
-          longitude: prev.longitude + numero(),
-        };
-      });
-    }, 5000);
-
-    return () => clearInterval(handleLocation);
-  }, []); */
 
   useEffect(() => {
     socket.on('driverLocation', data => {
+      console.log(data);
       setBusLocation(data);
     });
   }, []);
@@ -82,6 +81,9 @@ const Maps: React.FC = () => {
           </Marker>
         )}
       </MapView>
+      <TouchableOpacity onPress={setReturn} style={styles.button}>
+        <Text style={stylesText.textWhite}>Voltar</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -90,13 +92,22 @@ export default Maps;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  maps: {
     height: theme.screen.height,
     width: theme.screen.width,
   },
+  maps: {
+    flex: 1,
+  },
   marker: {
     alignItems: 'center',
+  },
+  button: {
+    backgroundColor: theme.colors.black,
+    padding: 10,
+    position: 'absolute',
+    bottom: 45,
+    right: 15,
+    zIndex: 2,
+    borderRadius: 10,
   },
 });
