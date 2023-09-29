@@ -3,7 +3,6 @@ import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 import {socket} from './services/socket';
 import {handleStatusPermissions} from './utils/permissions';
 import Routes from './routes/routes';
-import { theme } from './theme/theme';
 
 const App = (): JSX.Element => {
   useEffect(() => {

@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import MapView, {LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, {LatLng, Marker, PROVIDER_GOOGLE, Ani} from 'react-native-maps';
 import {stylesText, theme} from '../../theme/theme';
 import mapStyle from './mapStyle.json';
 import Geolocation from '@react-native-community/geolocation';
@@ -8,10 +8,14 @@ import IconMap from './components/IconMap';
 import {socket} from '../../services/socket';
 import {useNavigation} from '@react-navigation/native';
 
+interface Props extends LatLng {
+  name: string;
+}
+
 const Maps: React.FC = () => {
   const navigate = useNavigation();
   const [userLocation, setUserLocation] = useState<LatLng>();
-  const [busLocation, setBusLocation] = useState<LatLng>();
+  const [busLocation, setBusLocation] = useState<Props[]>([]);
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -54,17 +58,20 @@ const Maps: React.FC = () => {
           latitudeDelta: 0.09,
           longitudeDelta: 0.09,
         }}>
-        {busLocation && (
+        {busLocation.map(bus => (
           <Marker
-            key={'bus'}
+            key={bus.name}
             coordinate={{
-              latitude: busLocation.latitude,
-              longitude: busLocation.longitude,
+              latitude: bus.latitude,
+              longitude: bus.longitude,
             }}
             style={styles.marker}>
-            <IconMap image="https://2019.onibus.org/3/30/p/17e90fe3e1011016ce06bd45a193643c.jpg" />
+            <IconMap
+              name={bus.name}
+              image="https://2019.onibus.org/3/30/p/17e90fe3e1011016ce06bd45a193643c.jpg"
+            />
           </Marker>
-        )}
+        ))}
 
         {userLocation && (
           <Marker
@@ -74,7 +81,10 @@ const Maps: React.FC = () => {
               longitude: userLocation.longitude,
             }}
             style={styles.marker}>
-            <IconMap image="https://static.vecteezy.com/system/resources/thumbnails/008/442/086/small/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg" />
+            <IconMap
+              name="Você"
+              image="https://static.vecteezy.com/system/resources/thumbnails/008/442/086/small/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"
+            />
           </Marker>
         )}
       </MapView>

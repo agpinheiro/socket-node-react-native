@@ -9,39 +9,6 @@ import {useNavigation} from '@react-navigation/native';
 
 const Welcome: React.FC = () => {
   const navigate = useNavigation();
-  const [existsInterval, setExistsInterval] = useState<any>(null);
-
-  useEffect(() => {
-    handleStatusPermissions();
-  }, []);
-
-  const sendDriverLocation = () => {
-    Geolocation.getCurrentPosition(position => {
-      if (position) {
-        // console.log(position)
-        const userLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        };
-        socket.emit('driverLocation', userLocation);
-      };
-    });
-  };
-
-  const startSendLocation = () => {
-    const id = BackgroundTimer.runBackgroundTimer(() => {
-      sendDriverLocation();
-    }, 8000);
-    setExistsInterval(id);
-  };
-
-  const stopSendLocation = () => {
-    if (existsInterval !== null) {
-      BackgroundTimer.stopBackgroundTimer();
-      setExistsInterval(null);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -55,18 +22,10 @@ const Welcome: React.FC = () => {
       <TouchableOpacity
         onPress={() => {
           handleStatusPermissions();
-          startSendLocation();
+          navigate.navigate('SharedLocation');
         }}
         style={styles.button}>
         <Text style={stylesText.textWhite}>Compartilhar Localização</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={stopSendLocation}
-        style={[styles.button, {backgroundColor: '#884137'}]}>
-        <Text style={stylesText.textWhite}>
-          Parar de Compartilhar Localização
-        </Text>
       </TouchableOpacity>
     </View>
   );
