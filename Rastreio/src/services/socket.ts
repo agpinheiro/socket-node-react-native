@@ -1,2 +1,3 @@
 import io from 'socket.io-client';
-export const socket = io('http://143.110.232.194/');
+import Config from 'react-native-config';
+export const socket = io(Config.SERVER_HOST);
