@@ -1,12 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import MapView, {LatLng, Marker, PROVIDER_GOOGLE, Ani} from 'react-native-maps';
+import MapView, {LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import {stylesText, theme} from '../../theme/theme';
 import mapStyle from './mapStyle.json';
 import Geolocation from '@react-native-community/geolocation';
 import IconMap from './components/IconMap';
 import {socket} from '../../services/socket';
 import {useNavigation} from '@react-navigation/native';
+import {getStorage} from '../../utils/storage';
 
 interface Props extends LatLng {
   name: string;
@@ -17,14 +18,29 @@ const Maps: React.FC = () => {
   const [userLocation, setUserLocation] = useState<LatLng>();
   const [busLocation, setBusLocation] = useState<Props[]>([]);
   const mapRef = useRef(null);
+  const lastName = getStorage('name');
 
   useEffect(() => {
     getLocation();
-    const interval = setInterval(() => {
-      getLocation();
-    }, 60000);
-    return () => clearInterval(interval);
+    socket.on('driverLocation', (data: Props) => handleBuses(data));
   }, []);
+
+  const handleBuses = (data: Props) => {
+    console.log(busLocation);
+
+    setBusLocation(prev => {
+      prev.forEach(location => {
+        if (location.name === data.name) {
+          location.latitude = data.latitude;
+          location.longitude = data.longitude;
+        }
+      });
+      if (lastName === data.name) {
+        return [...prev];
+      }
+      return [...prev, data];
+    });
+  };
 
   const getLocation = () => {
     Geolocation.getCurrentPosition(position => {
@@ -37,13 +53,6 @@ const Maps: React.FC = () => {
     });
   };
 
-  useEffect(() => {
-    socket.on('driverLocation', data => {
-      // console.log(data);
-      setBusLocation(data);
-    });
-  }, []);
-
   return (
     <View style={styles.container}>
       <MapView
@@ -51,16 +60,15 @@ const Maps: React.FC = () => {
         ref={mapRef}
         style={styles.maps}
         customMapStyle={mapStyle}
-        showsMyLocationButton
         initialRegion={{
           latitude: -9.387738,
           longitude: -40.52541,
           latitudeDelta: 0.09,
           longitudeDelta: 0.09,
         }}>
-        {busLocation.map(bus => (
+        {busLocation.map((bus, index) => (
           <Marker
-            key={bus.name}
+            key={index.toString()}
             coordinate={{
               latitude: bus.latitude,
               longitude: bus.longitude,

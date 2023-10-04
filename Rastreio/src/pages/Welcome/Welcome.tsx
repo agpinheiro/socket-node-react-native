@@ -1,10 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {stylesText, theme} from '../../theme/theme';
-import {socket} from '../../services/socket';
 import {handleStatusPermissions} from '../../utils/permissions';
-import BackgroundTimer from 'react-native-background-timer';
-import Geolocation from '@react-native-community/geolocation';
 import {useNavigation} from '@react-navigation/native';
 
 const Welcome: React.FC = () => {

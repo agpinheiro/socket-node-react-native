@@ -6,7 +6,7 @@ import Routes from './routes/routes';
 
 const App = (): JSX.Element => {
   useEffect(() => {
-    handleStatusPermissions();
+    requestPermissions();
     socket.on('connect', () => {
       console.log('Conectado ao servidor WebSocket');
     });
@@ -15,6 +15,14 @@ const App = (): JSX.Element => {
       socket.disconnect();
     };
   }, []);
+
+  const requestPermissions = () => {
+    const timeOut = setTimeout(async () => {
+      await handleStatusPermissions();
+    }, 2000);
+
+    return () => clearTimeout(timeOut);
+  };
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="default" backgroundColor="#000" />

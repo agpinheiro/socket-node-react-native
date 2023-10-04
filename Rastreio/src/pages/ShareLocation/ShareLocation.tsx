@@ -8,7 +8,9 @@ import {
 } from 'react-native';
 import {stylesText, theme} from '../../theme/theme';
 import {LatLng} from 'react-native-maps';
-import Geolocation from '@react-native-community/geolocation';
+import Geolocation, {
+  GeolocationConfiguration,
+} from '@react-native-community/geolocation';
 import _BackgroundTimer from 'react-native-background-timer';
 import {socket} from '../../services/socket';
 import {getStorage, setStorage} from '../../utils/storage';
@@ -20,80 +22,110 @@ interface Props extends LatLng {
 
 const ShareLocation: React.FC = () => {
   const [name, setName] = useState<string>('');
-  const [active, setActive] = useState(false);
   const navigation = useNavigation();
+  const lastName = getStorage('name');
+  const [active, setActive] = useState(false);
+  const [share, setShare] = useState(false);
+
+  const BACKGROUND_LOCATION_OPTIONS: GeolocationConfiguration = {
+    skipPermissionRequests: true,
+    authorizationLevel: 'always',
+    locationProvider: 'auto',
+    enableBackgroundLocationUpdates: true,
+  };
+
+  let watchId: any = null;
 
   useEffect(() => {
-    const lastName = getStorage('name');
     lastName && setName(lastName);
+    setActive(true);
     socket.on('driverConnect', data => {
-      // console.log(data);
+      console.log('concect', data);
     });
+
+    return () => setActive(false);
   }, []);
 
-  const sendDriverLocation = () => {
-    Geolocation.watchPosition(
-      position => {
-        if (position) {
-          // console.log(position)
+  const startBackgroundLocationSharing = () => {
+    Geolocation.setRNConfiguration(BACKGROUND_LOCATION_OPTIONS);
+
+    // Verifique se já existe uma instância de watchId ativa
+    if (watchId === null) {
+      watchId = Geolocation.watchPosition(
+        position => {
           const userLocation: Props = {
             name: name,
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           };
           socket.emit('driverConnect', userLocation);
-        }
-      },
-      error => {
-        console.error(
-          `Erro na obtenção da localização do motorista ${name}: ${error.message}`,
-        );
-      },
-      {
-        enableHighAccuracy: true, // Precisão alta
-        distanceFilter: 20, // Atualizar a cada 10 metros
-      },
-    );
+        },
+        error => {
+          // Lide com erros aqui, se necessário
+          console.error('Erro na geolocalização:', error);
+        },
+        {
+          enableHighAccuracy: true, // Precisão alta
+          distanceFilter: 10, // Atualizar a cada 10 metros
+        },
+      );
+    }
+  };
+
+  const stopBackgroundLocationSharing = () => {
+    if (watchId !== null) {
+      Geolocation.clearWatch(watchId);
+      watchId = null;
+    }
   };
 
   const startSendLocation = () => {
     setStorage('name', name);
-    setActive(true);
-    if (!active) {
-      _BackgroundTimer.runBackgroundTimer(sendDriverLocation, 65000);
-    }
+    _BackgroundTimer.runBackgroundTimer(startBackgroundLocationSharing, 5000);
+    setShare(true);
+    //startBackgroundLocationSharing();
   };
 
   const stopSendLocation = () => {
-    setActive(false);
     _BackgroundTimer.stopBackgroundTimer();
+    setShare(false);
+    stopBackgroundLocationSharing();
   };
 
   return (
     <View style={styles.container}>
-      <TextInput
-        onChangeText={setName}
-        style={styles.input}
-        value={name}
-        placeholderTextColor="#000"
-        placeholder="Digite o nome do veículo"
-      />
+      <View
+        style={{
+          position: 'absolute',
+          top: 100,
+          alignSelf: 'center',
+          flexDirection: 'row',
+        }}>
+        {lastName && <Text style={stylesText.textBlack}>Nome: {lastName}</Text>}
+        {active && <View style={styles.ball} />}
+        {share && <View style={[styles.ball, {backgroundColor: 'blue'}]} />}
+      </View>
+
+      {!lastName && (
+        <TextInput
+          onChangeText={setName}
+          style={styles.input}
+          value={name}
+          placeholderTextColor="#000"
+          placeholder="Digite o nome do veículo"
+        />
+      )}
       <TouchableOpacity
         onPress={() => {
           startSendLocation();
-          navigation.navigate('Welcome');
+          //navigation.navigate('Welcome');
         }}
-        style={[styles.button, {backgroundColor: active ? '#011586' : '#000'}]}>
-        <Text style={stylesText.textWhite}>
-          {active ? 'Compartilhando' : 'Compartilhar Localização'}
-        </Text>
+        style={[styles.button, {backgroundColor: '#000'}]}>
+        <Text style={stylesText.textWhite}>Compartilhar Localização</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={stopSendLocation}
-        style={[
-          styles.button,
-          {backgroundColor: active ? '#bd4333' : '#884137'},
-        ]}>
+        style={[styles.button, {backgroundColor: '#884137'}]}>
         <Text style={stylesText.textWhite}>
           Parar de Compartilhar Localização
         </Text>
@@ -126,5 +158,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     marginHorizontal: 10,
     color: '#000',
+  },
+  ball: {
+    backgroundColor: 'green',
+    width: 20,
+    height: 20,
+    alignSelf: 'center',
+    borderRadius: 50,
+    marginLeft: 10,
   },
 });
